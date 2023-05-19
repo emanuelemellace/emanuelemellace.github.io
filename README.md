@@ -1,27 +1,41 @@
-# EmaxProject
+# Telegram Bot
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.3.2.
+Telegram Bot with TypeScript, Node.js, and Telegraf and deployment configuration for Heroku.
 
-## Development server
+## Medium article
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+[Build a Telegram Bot using TypeScript, Node.js, and Telegraf and deploy it on Heroku](https://pirasalbe.medium.com/build-a-telegram-bot-using-typescript-node-js-and-telegraf-and-deploy-it-on-heroku-fcc28c15614f)
 
-## Code scaffolding
+## Build the project with TypeScript
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+```
+npm run build
+```
 
-## Build
+## Run the project
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Start script
 
-## Running unit tests
+```
+npm start
+```
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+&nbsp;
 
-## Running end-to-end tests
+Define _token_ and run the project
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+```
+BOT_TOKEN="110201543:AAHdqTcvCH1vGWJxfSeofSAs0K5PALDsaw" npm start
+```
 
-## Further help
+_Replace the token in the command, which is **invalid**, with your own._
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+&nbsp;
+
+Define _token_ and _chat id_ and run the project
+
+```
+BOT_TOKEN="110201543:AAHdqTcvCH1vGWJxfSeofSAs0K5PALDsaw" CHAT_ID="123456789" npm start
+```
+
+_Replace the chat id in the command, which is **invalid**, with your own._

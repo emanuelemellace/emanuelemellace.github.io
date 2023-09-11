@@ -25,10 +25,20 @@ botAdmin.start((ctx) => {
         Markup.button.callback('Lista Pr', 'lista'),
         Markup.button.callback('Leggi', 'leggi'),
         Markup.button.callback('Scrivi A', 'scriviA'),
-        Markup.button.callback('Scrivi B', 'scriviB'),
+        Markup.button.callback('Aggiungi', 'aggiungi'),
       ])
   );
 });
+
+botAdmin.action('lista', (ctx) => {
+  const rawdata = fs.readFileSync('./src/assets/db.json');
+  fileDB = JSON.parse(rawdata);
+  console.log(fileDB);
+  fileDB.forEach((user:user) => {
+    ctx.reply('username: ' + user.username + ' ticket: ' + user.ticket + ' status: ' + user.status)
+  })
+})
+
 
 botAdmin.action('leggi', async (ctx) => {
   const rawdata = fs.readFileSync('./src/assets/db.json');
@@ -37,6 +47,10 @@ botAdmin.action('leggi', async (ctx) => {
 })
 
 botAdmin.action('scriviA', async (ctx) => {
+  const rawdata = fs.readFileSync('./src/assets/db.json'); // leggere file solo se filDb vuoto
+  fileDB = JSON.parse(rawdata);
+  console.log(fileDB);
+
   const data = [{ username: 'mod', ticket: 15, status: true }];
   fs.writeFile(
     './src/assets/db.json',
@@ -48,7 +62,11 @@ botAdmin.action('scriviA', async (ctx) => {
   );
 })
 
-botAdmin.action('scriviB', async (ctx) => {
+botAdmin.action('aggiungi', async (ctx) => {
+  const rawdata = fs.readFileSync('./src/assets/db.json');
+  fileDB = JSON.parse(rawdata);
+  console.log(fileDB);
+
   const data: user = { username: 'user', ticket: 15, status: true };
   fileDB.push(data);
   fs.writeFile(

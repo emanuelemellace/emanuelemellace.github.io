@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const telegraf_1 = require("telegraf");
+/* eslint-disable @typescript-eslint/no-var-requires */
 const qrcode = require('qrcode');
 const fs = require('fs');
 const Jimp = require('jimp');

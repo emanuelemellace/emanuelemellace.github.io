@@ -1,10 +1,12 @@
 import { Context, Markup, Telegraf, Telegram } from 'telegraf';
 import { Update } from 'typegram';
+
+/* eslint-disable @typescript-eslint/no-var-requires */
 const qrcode = require('qrcode');
 const fs = require('fs');
 const Jimp = require('jimp');
 
-const token: string = '6298609369:AAFYUL8NBp3_9bowjy1EIxamJA1NQuCq0A4';// process.env.BOT_TOKEN as string;
+const token = '6298609369:AAFYUL8NBp3_9bowjy1EIxamJA1NQuCq0A4';// process.env.BOT_TOKEN as string;
 
 const telegram: Telegram = new Telegram(token);
 

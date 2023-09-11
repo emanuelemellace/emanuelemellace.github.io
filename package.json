@@ -9,7 +9,8 @@
   },
   "scripts": {
     "build": "tsc",
-    "start": "node docs/app.js"
+    "start": "node docs/app.js",
+    "fast": "npm run build && npm start"
   },
   "license": "GPL-3.0",
   "devDependencies": {

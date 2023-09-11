@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const telegraf_1 = require("telegraf");
 /* eslint-disable @typescript-eslint/no-var-requires */
+'use strict';
 const qrcode = require('qrcode');
 const fs = require('fs');
 const Jimp = require('jimp');
@@ -9,11 +10,26 @@ const tokenAdmin = '6298609369:AAFYUL8NBp3_9bowjy1EIxamJA1NQuCq0A4'; // process.
 const botAdmin = new telegraf_1.Telegraf(tokenAdmin);
 const tokenPr = '6432421833:AAGS0bcKsohN9qMxS1ndq-bjUrEgiE97XjI';
 botAdmin.start((ctx) => {
-    ctx.reply('Ciao ' + ctx.from.first_name + '!');
-    ctx.reply('Keyboard', telegraf_1.Markup.inlineKeyboard([
+    ctx.reply(' Ciao ' + ctx.from.first_name + '!', telegraf_1.Markup.inlineKeyboard([
         telegraf_1.Markup.button.callback('Genera Prevendita', 'prevendita'),
         telegraf_1.Markup.button.callback('Lista Pr', 'lista'),
+        telegraf_1.Markup.button.callback('Leggi', 'leggi'),
+        telegraf_1.Markup.button.callback('Scrivi', 'scrivi'),
     ]));
+});
+botAdmin.action('leggi', async (ctx) => {
+    const rawdata = fs.readFileSync('assets/db.json');
+    const data = JSON.parse(rawdata);
+    console.log(data);
+});
+botAdmin.action('scrivi', async (ctx) => {
+    const data = [{ username: 'mod', ticket: 15, status: true }];
+    // fs.writeFileSync('assets/db.json', data);
+    fs.writeFile('assets/db.json', JSON.stringify(data), (err) => {
+        if (err)
+            throw err;
+        console.log('Data written to file');
+    });
 });
 botAdmin.action('prevendita', async (ctx) => {
     const chatId = ctx.chat.id;

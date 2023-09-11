@@ -2,6 +2,7 @@ import { Context, Markup, Telegraf } from 'telegraf';
 import { Update } from 'typegram';
 
 /* eslint-disable @typescript-eslint/no-var-requires */
+'use strict';
 
 const qrcode = require('qrcode');
 const fs = require('fs');
@@ -13,15 +14,34 @@ const botAdmin: Telegraf<Context<Update>> = new Telegraf(tokenAdmin);
 const tokenPr = '6432421833:AAGS0bcKsohN9qMxS1ndq-bjUrEgiE97XjI';
 
 botAdmin.start((ctx) => {
-  ctx.reply('Ciao ' + ctx.from.first_name + '!');
   ctx.reply(
-      'Keyboard',
+    ' Ciao ' + ctx.from.first_name + '!',
       Markup.inlineKeyboard([
         Markup.button.callback('Genera Prevendita', 'prevendita'),
         Markup.button.callback('Lista Pr', 'lista'),
+        Markup.button.callback('Leggi', 'leggi'),
+        Markup.button.callback('Scrivi', 'scrivi'),
       ])
   );
 });
+
+botAdmin.action('leggi', async (ctx) => {
+  const rawdata = fs.readFileSync('assets/db.json');
+  const data = JSON.parse(rawdata);
+  console.log(data);
+})
+
+botAdmin.action('scrivi', async (ctx) => {
+  const data = [{ username: 'mod', ticket: 15, status: true }];
+  fs.writeFile(
+    'assets/db.json',
+    JSON.stringify(data),
+    (err: any) => {
+      if (err) throw err;
+      console.log('Data written to file');
+    }
+  );
+})
 
 botAdmin.action('prevendita', async (ctx) => {
   const chatId = ctx.chat!.id;
@@ -47,7 +67,6 @@ botAdmin.action('prevendita', async (ctx) => {
     ctx.reply('Si è verificato un errore nella generazione del QR code.');
   }
 });
-
 
 botAdmin.launch();
 // Enable graceful stop

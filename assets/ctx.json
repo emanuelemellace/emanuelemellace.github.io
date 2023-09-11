@@ -1,0 +1,39 @@
+Context {
+  update: {
+    update_id: 41542320,
+    message: {
+      message_id: 122,
+      from: [Object
+      ],
+      chat: [Object
+      ],
+      date: 1694467595,
+      text: '/start',
+      entities: [Array
+      ]
+    }
+  },
+  tg: Telegram {
+    token: '6298609369:AAFYUL8NBp3_9bowjy1EIxamJA1NQuCq0A4',
+    response: undefined,
+    options: {
+      apiRoot: 'https: //api.telegram.org',
+      apiMode: 'bot',
+      webhookReply: true,
+      agent: [Agent
+      ],
+      attachmentAgent: undefined
+    }
+  },
+  botInfo: {
+    id: 6298609369,
+    is_bot: true,
+    first_name: 'Test_admin',
+    username: 'TestAdminBlaBlaBot',
+    can_join_groups: true,
+    can_read_all_group_messages: false,
+    supports_inline_queries: false
+  },
+  state: {},
+  startPayload: ''
+}

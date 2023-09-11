@@ -1,0 +1,12 @@
+[
+  {
+    "username":"user",
+    "nTicket":20,
+    "status":true
+  },
+  {
+    "username": "user",
+    "nTicket": 20,
+    "status": true
+  }
+]

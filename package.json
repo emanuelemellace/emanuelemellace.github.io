@@ -1,7 +1,7 @@
 {
-  "name": "telegram-bot_node",
+  "name": "telegram-bot",
   "version": "1.0.0",
-  "description": "Telegram Bot with TypeScript, Node.js, and Telegraf and deployment configuration for Heroku",
+  "description": "Telegram Bot",
   "main": "docs/app.js",
   "engines": {
     "node": "17.0",
@@ -9,19 +9,9 @@
   },
   "scripts": {
     "build": "tsc",
-    "start": "node docs/app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node docs/app.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/pirasalbe/Telegram-Bot_Node.js.git"
-  },
-  "author": "pirasalbe",
   "license": "GPL-3.0",
-  "bugs": {
-    "url": "https://github.com/pirasalbe/Telegram-Bot_Node.js/issues"
-  },
-  "homepage": "https://github.com/pirasalbe/Telegram-Bot_Node.js#readme",
   "devDependencies": {
     "@types/node": "^16.11.4",
     "@typescript-eslint/eslint-plugin": "^5.1.0",

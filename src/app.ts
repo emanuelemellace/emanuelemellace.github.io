@@ -1,5 +1,4 @@
 import { Context, Markup, Telegraf } from 'telegraf';
-// import { Telegram } from 'telegraf';
 import { Update } from 'typegram';
 
 /* eslint-disable @typescript-eslint/no-var-requires */
@@ -13,35 +12,19 @@ const botAdmin: Telegraf<Context<Update>> = new Telegraf(tokenAdmin);
 
 const tokenPr = '6432421833:AAGS0bcKsohN9qMxS1ndq-bjUrEgiE97XjI';
 
-// const tgAdmin: Telegram = new Telegram(tokenAdmin);
-// const chatId: string = process.env.CHAT_ID as string;
-
 botAdmin.start((ctx) => {
-  ctx.reply('Hello ' + ctx.from.first_name + '!');
-  ctx.reply('Send /start to receive a greeting');
-  ctx.reply('Send /keyboard to receive a message with a keyboard');
-  ctx.reply('Send /prevendita to receive aqr');
-  // ctx.reply('Send /quit to stop the bot');
-});
-
-// crush start
-// botAdmin.command('quit', (ctx) => {
-//   ctx.telegram.leaveChat(ctx.message.chat.id);
-//   ctx.leaveChat();
-// });
-
-botAdmin.command('keyboard', (ctx) => {
+  ctx.reply('Ciao ' + ctx.from.first_name + '!');
   ctx.reply(
-    'Keyboard',
-    Markup.inlineKeyboard([
-      Markup.button.callback('First option', 'first'),
-      Markup.button.callback('Second option', 'second'),
-    ])
+      'Keyboard',
+      Markup.inlineKeyboard([
+        Markup.button.callback('Genera Prevendita', 'prevendita'),
+        Markup.button.callback('Lista Pr', 'lista'),
+      ])
   );
 });
 
-botAdmin.command('prevendita', async (ctx) => {
-  const chatId = ctx.chat.id;
+botAdmin.action('prevendita', async (ctx) => {
+  const chatId = ctx.chat!.id;
   const qrData = 'ciao';
   const qrCodePath = 'qr_code.png';
   const templatePath = './template/template.png'; // Inserisci il percorso del tuo file di template
@@ -65,8 +48,8 @@ botAdmin.command('prevendita', async (ctx) => {
   }
 });
 
-botAdmin.launch();
 
+botAdmin.launch();
 // Enable graceful stop
 process.once('SIGINT', () => botAdmin.stop('SIGINT'));
 process.once('SIGTERM', () => botAdmin.stop('SIGTERM'));

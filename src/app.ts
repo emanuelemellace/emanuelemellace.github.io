@@ -4,7 +4,7 @@ const qrcode = require('qrcode');
 const fs = require('fs');
 const Jimp = require('jimp');
 
-const token: string = '5978681198:AAGUSDMHg-PEvs-BygeWOYW2s_korID6Aw8';// process.env.BOT_TOKEN as string;
+const token: string = '6298609369:AAFYUL8NBp3_9bowjy1EIxamJA1NQuCq0A4';// process.env.BOT_TOKEN as string;
 
 const telegram: Telegram = new Telegram(token);
 

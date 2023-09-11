@@ -1,17 +1,21 @@
-import { Context, Markup, Telegraf } from 'telegraf';
-import { Update } from 'typegram';
-
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-var-requires */
 'use strict';
+
+import { Context, Markup, Telegraf } from 'telegraf';
+import { Update } from 'typegram';
+import { user } from './assets/db.models';
 
 const qrcode = require('qrcode');
 const fs = require('fs');
 const Jimp = require('jimp');
 
-const tokenAdmin = '6298609369:AAFYUL8NBp3_9bowjy1EIxamJA1NQuCq0A4'; // process.env.BOT_TOKEN as string;
+const tokenAdmin = '6298609369:AAFYUL8NBp3_9bowjy1EIxamJA1NQuCq0A4';
 const botAdmin: Telegraf<Context<Update>> = new Telegraf(tokenAdmin);
 
 const tokenPr = '6432421833:AAGS0bcKsohN9qMxS1ndq-bjUrEgiE97XjI';
+
+let fileDB: user[];
 
 botAdmin.start((ctx) => {
   ctx.reply(
@@ -20,22 +24,36 @@ botAdmin.start((ctx) => {
         Markup.button.callback('Genera Prevendita', 'prevendita'),
         Markup.button.callback('Lista Pr', 'lista'),
         Markup.button.callback('Leggi', 'leggi'),
-        Markup.button.callback('Scrivi', 'scrivi'),
+        Markup.button.callback('Scrivi A', 'scriviA'),
+        Markup.button.callback('Scrivi B', 'scriviB'),
       ])
   );
 });
 
 botAdmin.action('leggi', async (ctx) => {
-  const rawdata = fs.readFileSync('assets/db.json');
-  const data = JSON.parse(rawdata);
-  console.log(data);
+  const rawdata = fs.readFileSync('./src/assets/db.json');
+  fileDB = JSON.parse(rawdata);
+  console.log(fileDB);
 })
 
-botAdmin.action('scrivi', async (ctx) => {
+botAdmin.action('scriviA', async (ctx) => {
   const data = [{ username: 'mod', ticket: 15, status: true }];
   fs.writeFile(
-    'assets/db.json',
+    './src/assets/db.json',
     JSON.stringify(data),
+    (err: any) => {
+      if (err) throw err;
+      console.log('Data written to file');
+    }
+  );
+})
+
+botAdmin.action('scriviB', async (ctx) => {
+  const data: user = { username: 'user', ticket: 15, status: true };
+  fileDB.push(data);
+  fs.writeFile(
+    './src/assets/db.json',
+    JSON.stringify(fileDB),
     (err: any) => {
       if (err) throw err;
       console.log('Data written to file');
@@ -47,7 +65,7 @@ botAdmin.action('prevendita', async (ctx) => {
   const chatId = ctx.chat!.id;
   const qrData = 'ciao';
   const qrCodePath = 'qr_code.png';
-  const templatePath = './template/template.png'; // Inserisci il percorso del tuo file di template
+  const templatePath = './src/template/template.png'; // Inserisci il percorso del tuo file di template
 
   try {
     const qrCodeImage = await qrcode.toDataURL(qrData); // Genera il QR code come immagine base64
@@ -62,11 +80,13 @@ botAdmin.action('prevendita', async (ctx) => {
     console.log('QR code generato con successo.');
     await ctx.replyWithPhoto({ source: qrCodePath }, { caption: 'Ecco il QR code generato.' }); // Invia il QR code come foto al chatId specificato
     fs.unlinkSync(qrCodePath); // Elimina il file locale dopo l'invio della foto
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Si è verificato un errore nella generazione del QR code:', error);
     ctx.reply('Si è verificato un errore nella generazione del QR code.');
   }
 });
+
 
 botAdmin.launch();
 // Enable graceful stop

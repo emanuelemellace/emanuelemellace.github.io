@@ -10,16 +10,29 @@ const tokenAdmin = '6298609369:AAFYUL8NBp3_9bowjy1EIxamJA1NQuCq0A4';
 const botAdmin = new telegraf_1.Telegraf(tokenAdmin);
 const tokenPr = '6432421833:AAGS0bcKsohN9qMxS1ndq-bjUrEgiE97XjI';
 let fileDB;
-botAdmin.start((ctx) => {
+botAdmin.start(ctx => {
     ctx.reply(' Ciao ' + ctx.from.first_name + '!', telegraf_1.Markup.inlineKeyboard([
         telegraf_1.Markup.button.callback('Genera Prevendita', 'prevendita'),
         telegraf_1.Markup.button.callback('Lista Pr', 'lista'),
         telegraf_1.Markup.button.callback('Leggi', 'leggi'),
         telegraf_1.Markup.button.callback('Scrivi A', 'scriviA'),
         telegraf_1.Markup.button.callback('Aggiungi', 'aggiungi'),
+        telegraf_1.Markup.button.callback('del', 'del'),
     ]));
 });
-botAdmin.action('lista', (ctx) => {
+botAdmin.action('del', async (ctx) => {
+    const message = ctx.update.callback_query.message;
+    const id = message.message_id;
+    const chatId = ctx.chat.id;
+    try {
+        await botAdmin.telegram.deleteMessage(ctx.chat.id, id);
+        // await ctx.deleteMessage(id - 1);
+    }
+    catch (error) {
+        console.error('Errore durante l\'eliminazione del messaggio:', error);
+    }
+});
+botAdmin.action('lista', ctx => {
     const rawdata = fs.readFileSync('./src/assets/db.json');
     fileDB = JSON.parse(rawdata);
     console.log(fileDB);

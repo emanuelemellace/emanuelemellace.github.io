@@ -5,6 +5,7 @@
 import { Context, Markup, Telegraf } from 'telegraf';
 import { Update } from 'typegram';
 import { user } from './assets/db.models';
+import { readFile } from './utils';
 
 const qrcode = require('qrcode');
 const fs = require('fs');
@@ -15,63 +16,48 @@ const botAdmin: Telegraf<Context<Update>> = new Telegraf(tokenAdmin);
 
 const tokenPr = '6432421833:AAGS0bcKsohN9qMxS1ndq-bjUrEgiE97XjI';
 
-let fileDB: user[];
+let listUser: user[];
 
-botAdmin.start((ctx) => {
+botAdmin.start(ctx => {
   ctx.reply(
-    ' Ciao ' + ctx.from.first_name + '!',
+    ' Ciao ' + ctx.from!.first_name + '!',
       Markup.inlineKeyboard([
-        Markup.button.callback('Genera Prevendita', 'prevendita'),
+        //Markup.button.callback('Genera Prevendita', 'prevendita'),
         Markup.button.callback('Lista Pr', 'lista'),
-        Markup.button.callback('Leggi', 'leggi'),
-        Markup.button.callback('Scrivi A', 'scriviA'),
         Markup.button.callback('Aggiungi', 'aggiungi'),
+        //Markup.button.callback('del', 'del'), funzione in sviluppo per pulizia dello schermo da admin in automatico
       ])
   );
 });
 
+botAdmin.action('del', async ctx => {
+  const message = ctx.update!.callback_query!.message!;
+  const id = message.message_id
+  const chatId = ctx.chat!.id;
+  try {
+    await botAdmin.telegram.deleteMessage(ctx.chat!.id, id);
+    // await ctx.deleteMessage(id - 1);
+  } catch (error) {
+    console.error('Errore durante l\'eliminazione del messaggio:', error);
+  }
+
+})
+
 botAdmin.action('lista', (ctx) => {
-  const rawdata = fs.readFileSync('./src/assets/db.json');
-  fileDB = JSON.parse(rawdata);
-  console.log(fileDB);
-  fileDB.forEach((user:user) => {
+  listUser = readFile();
+  listUser.forEach((user:user) => {
     ctx.reply('username: ' + user.username + ' ticket: ' + user.ticket + ' status: ' + user.status)
   })
 })
 
-
-botAdmin.action('leggi', async (ctx) => {
-  const rawdata = fs.readFileSync('./src/assets/db.json');
-  fileDB = JSON.parse(rawdata);
-  console.log(fileDB);
-})
-
-botAdmin.action('scriviA', async (ctx) => {
-  const rawdata = fs.readFileSync('./src/assets/db.json'); // leggere file solo se filDb vuoto
-  fileDB = JSON.parse(rawdata);
-  console.log(fileDB);
-
-  const data = [{ username: 'mod', ticket: 15, status: true }];
-  fs.writeFile(
-    './src/assets/db.json',
-    JSON.stringify(data),
-    (err: any) => {
-      if (err) throw err;
-      console.log('Data written to file');
-    }
-  );
-})
-
 botAdmin.action('aggiungi', async (ctx) => {
-  const rawdata = fs.readFileSync('./src/assets/db.json');
-  fileDB = JSON.parse(rawdata);
-  console.log(fileDB);
+  listUser = readFile();
 
   const data: user = { username: 'user', ticket: 15, status: true };
-  fileDB.push(data);
+  listUser.push(data);
   fs.writeFile(
     './src/assets/db.json',
-    JSON.stringify(fileDB),
+    JSON.stringify(listUser),
     (err: any) => {
       if (err) throw err;
       console.log('Data written to file');

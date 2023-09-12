@@ -7,6 +7,11 @@ export interface user {
   status: boolean
 }
 
+export interface newUser {
+  user: user,
+  state: number
+}
+
 export interface ContextRes {
   update: Update;
   tg: Telegram;

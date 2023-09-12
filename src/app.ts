@@ -1,11 +1,13 @@
+/* eslint-disable prefer-const */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-var-requires */
 'use strict';
 
 import { Context, Markup, Telegraf } from 'telegraf';
 import { Update } from 'typegram';
-import { user } from './assets/db.models';
-import { readFile } from './utils';
+import { newUser, user } from './assets/db.models';
+import { readFileDb, writeFileDb } from './utils';
 
 const qrcode = require('qrcode');
 const fs = require('fs');
@@ -17,53 +19,68 @@ const botAdmin: Telegraf<Context<Update>> = new Telegraf(tokenAdmin);
 const tokenPr = '6432421833:AAGS0bcKsohN9qMxS1ndq-bjUrEgiE97XjI';
 
 let listUser: user[];
+let addUser: newUser = {
+  user: {
+    username: '',
+    ticket: 0,
+    status: false
+  },
+  state: -1
+};
+
+const operation = Markup.inlineKeyboard([
+  Markup.button.callback('Lista PR', 'lista'),
+  Markup.button.callback('Aggiungi PR', 'addUser'),
+  //Markup.button.callback('Genera Prevendita', 'prevendita'), // solo per bot pr
+  //Markup.button.callback('del', 'del'), funzione in sviluppo per pulizia dello schermo da admin in automatico
+])
 
 botAdmin.start(ctx => {
   ctx.reply(
     ' Ciao ' + ctx.from!.first_name + '!',
-      Markup.inlineKeyboard([
-        //Markup.button.callback('Genera Prevendita', 'prevendita'),
-        Markup.button.callback('Lista Pr', 'lista'),
-        Markup.button.callback('Aggiungi', 'aggiungi'),
-        //Markup.button.callback('del', 'del'), funzione in sviluppo per pulizia dello schermo da admin in automatico
-      ])
+    operation
   );
 });
 
-botAdmin.action('del', async ctx => {
-  const message = ctx.update!.callback_query!.message!;
-  const id = message.message_id
-  const chatId = ctx.chat!.id;
-  try {
-    await botAdmin.telegram.deleteMessage(ctx.chat!.id, id);
-    // await ctx.deleteMessage(id - 1);
-  } catch (error) {
-    console.error('Errore durante l\'eliminazione del messaggio:', error);
-  }
-
-})
-
 botAdmin.action('lista', (ctx) => {
-  listUser = readFile();
-  listUser.forEach((user:user) => {
-    ctx.reply('username: ' + user.username + ' ticket: ' + user.ticket + ' status: ' + user.status)
-  })
+  listUser = readFileDb();
+  if (listUser && listUser.length > 0) {
+    listUser.forEach((user: user) => {
+      ctx.reply('username: ' + user.username + ' ticket: ' + user.ticket + ' status: ' + user.status)
+    })
+  }
+  else {
+    ctx.reply('Non sono presenti Pr nel sistema')
+  }
 })
 
-botAdmin.action('aggiungi', async (ctx) => {
-  listUser = readFile();
-
-  const data: user = { username: 'user', ticket: 15, status: true };
-  listUser.push(data);
-  fs.writeFile(
-    './src/assets/db.json',
-    JSON.stringify(listUser),
-    (err: any) => {
-      if (err) throw err;
-      console.log('Data written to file');
-    }
-  );
+botAdmin.action('addUser', async (ctx) => {
+  addUser.state = 0;
+  await ctx.reply('Inserisci username:');
 })
+
+botAdmin.on('text', async (ctx) => {
+  listUser = readFileDb();
+  switch (addUser.state) {
+    case 0:
+      addUser.state = 1;
+      addUser.user.username = ctx.update.message.text;
+      await ctx.reply('Inserisci numero prevendite:');
+      break;
+    case 1:
+      addUser.state = 2;
+      addUser.user.ticket = +ctx.update.message.text;
+      await ctx.reply('Attivo gia da ora (y/n):');
+      break;
+    case 2:
+      addUser.state = -1;
+      addUser.user.status = ctx.update.message.text.toLowerCase() === 'y';
+      listUser.push(addUser.user);
+      writeFileDb(listUser);
+      await ctx.reply('Utente salvato correttamente', operation);
+      break;
+  }
+});
 
 botAdmin.action('prevendita', async (ctx) => {
   const chatId = ctx.chat!.id;
@@ -91,6 +108,18 @@ botAdmin.action('prevendita', async (ctx) => {
   }
 });
 
+botAdmin.action('del', async ctx => {
+  const message = ctx.update!.callback_query!.message!;
+  const id = message.message_id
+  const chatId = ctx.chat!.id;
+  try {
+    await botAdmin.telegram.deleteMessage(ctx.chat!.id, id);
+    // await ctx.deleteMessage(id - 1);
+  } catch (error) {
+    console.error('Errore durante l\'eliminazione del messaggio:', error);
+  }
+
+})
 
 botAdmin.launch();
 // Enable graceful stop

@@ -1,72 +1,71 @@
+/* eslint-disable prefer-const */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-var-requires */
 'use strict';
 Object.defineProperty(exports, "__esModule", { value: true });
 const telegraf_1 = require("telegraf");
+const utils_1 = require("./utils");
 const qrcode = require('qrcode');
 const fs = require('fs');
 const Jimp = require('jimp');
 const tokenAdmin = '6298609369:AAFYUL8NBp3_9bowjy1EIxamJA1NQuCq0A4';
 const botAdmin = new telegraf_1.Telegraf(tokenAdmin);
 const tokenPr = '6432421833:AAGS0bcKsohN9qMxS1ndq-bjUrEgiE97XjI';
-let fileDB;
+let listUser;
+let addUser = {
+    user: {
+        username: '',
+        ticket: 0,
+        status: false
+    },
+    state: -1
+};
+const operation = telegraf_1.Markup.inlineKeyboard([
+    telegraf_1.Markup.button.callback('Lista PR', 'lista'),
+    telegraf_1.Markup.button.callback('Aggiungi PR', 'addUser'),
+    //Markup.button.callback('Genera Prevendita', 'prevendita'), // solo per bot pr
+    //Markup.button.callback('del', 'del'), funzione in sviluppo per pulizia dello schermo da admin in automatico
+]);
 botAdmin.start(ctx => {
-    ctx.reply(' Ciao ' + ctx.from.first_name + '!', telegraf_1.Markup.inlineKeyboard([
-        telegraf_1.Markup.button.callback('Genera Prevendita', 'prevendita'),
-        telegraf_1.Markup.button.callback('Lista Pr', 'lista'),
-        telegraf_1.Markup.button.callback('Leggi', 'leggi'),
-        telegraf_1.Markup.button.callback('Scrivi A', 'scriviA'),
-        telegraf_1.Markup.button.callback('Aggiungi', 'aggiungi'),
-        telegraf_1.Markup.button.callback('del', 'del'),
-    ]));
+    ctx.reply(' Ciao ' + ctx.from.first_name + '!', operation);
 });
-botAdmin.action('del', async (ctx) => {
-    const message = ctx.update.callback_query.message;
-    const id = message.message_id;
-    const chatId = ctx.chat.id;
-    try {
-        await botAdmin.telegram.deleteMessage(ctx.chat.id, id);
-        // await ctx.deleteMessage(id - 1);
+botAdmin.action('lista', (ctx) => {
+    listUser = (0, utils_1.readFileDb)();
+    if (listUser && listUser.length > 0) {
+        listUser.forEach((user) => {
+            ctx.reply('username: ' + user.username + ' ticket: ' + user.ticket + ' status: ' + user.status);
+        });
     }
-    catch (error) {
-        console.error('Errore durante l\'eliminazione del messaggio:', error);
+    else {
+        ctx.reply('Non sono presenti Pr nel sistema');
     }
 });
-botAdmin.action('lista', ctx => {
-    const rawdata = fs.readFileSync('./src/assets/db.json');
-    fileDB = JSON.parse(rawdata);
-    console.log(fileDB);
-    fileDB.forEach((user) => {
-        ctx.reply('username: ' + user.username + ' ticket: ' + user.ticket + ' status: ' + user.status);
-    });
+botAdmin.action('addUser', async (ctx) => {
+    addUser.state = 0;
+    await ctx.reply('Inserisci username:');
 });
-botAdmin.action('leggi', async (ctx) => {
-    const rawdata = fs.readFileSync('./src/assets/db.json');
-    fileDB = JSON.parse(rawdata);
-    console.log(fileDB);
-});
-botAdmin.action('scriviA', async (ctx) => {
-    const rawdata = fs.readFileSync('./src/assets/db.json'); // leggere file solo se filDb vuoto
-    fileDB = JSON.parse(rawdata);
-    console.log(fileDB);
-    const data = [{ username: 'mod', ticket: 15, status: true }];
-    fs.writeFile('./src/assets/db.json', JSON.stringify(data), (err) => {
-        if (err)
-            throw err;
-        console.log('Data written to file');
-    });
-});
-botAdmin.action('aggiungi', async (ctx) => {
-    const rawdata = fs.readFileSync('./src/assets/db.json');
-    fileDB = JSON.parse(rawdata);
-    console.log(fileDB);
-    const data = { username: 'user', ticket: 15, status: true };
-    fileDB.push(data);
-    fs.writeFile('./src/assets/db.json', JSON.stringify(fileDB), (err) => {
-        if (err)
-            throw err;
-        console.log('Data written to file');
-    });
+botAdmin.on('text', async (ctx) => {
+    listUser = (0, utils_1.readFileDb)();
+    switch (addUser.state) {
+        case 0:
+            addUser.state = 1;
+            addUser.user.username = ctx.update.message.text;
+            await ctx.reply('Inserisci numero prevendite:');
+            break;
+        case 1:
+            addUser.state = 2;
+            addUser.user.ticket = +ctx.update.message.text;
+            await ctx.reply('Attivo gia da ora (y/n):');
+            break;
+        case 2:
+            addUser.state = -1;
+            addUser.user.status = ctx.update.message.text.toLowerCase() === 'y';
+            listUser.push(addUser.user);
+            (0, utils_1.writeFileDb)(listUser);
+            await ctx.reply('Utente salvato correttamente', operation);
+            break;
+    }
 });
 botAdmin.action('prevendita', async (ctx) => {
     const chatId = ctx.chat.id;
@@ -90,6 +89,18 @@ botAdmin.action('prevendita', async (ctx) => {
     catch (error) {
         console.error('Si è verificato un errore nella generazione del QR code:', error);
         ctx.reply('Si è verificato un errore nella generazione del QR code.');
+    }
+});
+botAdmin.action('del', async (ctx) => {
+    const message = ctx.update.callback_query.message;
+    const id = message.message_id;
+    const chatId = ctx.chat.id;
+    try {
+        await botAdmin.telegram.deleteMessage(ctx.chat.id, id);
+        // await ctx.deleteMessage(id - 1);
+    }
+    catch (error) {
+        console.error('Errore durante l\'eliminazione del messaggio:', error);
     }
 });
 botAdmin.launch();

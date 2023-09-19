@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifica ID Prevendita</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        #verify-button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Verifica ID Prevendita</h1>
+    <div id="result"></div>
+
+    <script>
+        const resultDiv = document.getElementById('result');
+
+        // Funzione per ottenere il valore del parametro 'id' dalla stringa dell'URL
+        function getQueryParam(param) {
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            return urlParams.get(param);
+        }
+
+        // Ottenere il valore del parametro 'id' dall'URL
+        const prevenditaId = getQueryParam('id');
+
+        if (prevenditaId) {
+            // Effettua la richiesta AJAX per ottenere il file JSON con gli oggetti prevendita
+            fetch('../assets/prevendite.json')
+                .then(response => response.json())
+                .then(data => {
+                    const isIdPresent = data.some(prevendita => prevendita.id === prevenditaId);
+                    if (isIdPresent) {
+                        resultDiv.innerText = 'L\'ID della prevendita è presente nel file JSON.';
+                    } else {
+                        resultDiv.innerText = 'L\'ID della prevendita non è presente nel file JSON.';
+                    }
+                })
+                .catch(error => {
+                    resultDiv.innerText = 'Si è verificato un errore durante la verifica.';
+                    console.error(error);
+                });
+        } else {
+            resultDiv.innerText = 'Inserisci un ID di prevendita valido nell\'URL.';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+[
+    {
+        "id": "1",
+        "pr": "Pr 1",
+        "data": "2023-09-16T12:00:00Z",
+        "event": "Evento 1",
+        "isReaded": true
+    },
+    {
+        "id": "2",
+        "pr": "Pr 1",
+        "data": "2023-09-17T14:30:00Z",
+        "event": "Evento 1",
+        "isReaded": false
+    },
+    {
+        "id": "3",
+        "pr": "Pr 2",
+        "data": "2023-09-18T09:15:00Z",
+        "event": "Evento 1",
+        "isReaded": true
+    }
+]
